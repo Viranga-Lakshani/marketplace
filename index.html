@@ -1,9 +1,3 @@
-To update your real estate platform, I have integrated the new logo, refined the color palette to match its professional aesthetic, and polished the navigation bar while preserving your original homepage layout and functionality.
-Key Changes Made:
- * Logo Integration: Replaced the text logo with the new "Infinitzy" branding.
- * Color Palette Refinement: Updated the CSS variables (--gold, --gold-light, and --brown) to match the specific tones of the logo for a cohesive brand identity.
- * Navigation Polish: Adjusted the logo container to ensure it scales perfectly within the sticky header.
- * Maintained Structure: All original scripts, page transitions, and the "Post Ad" functionality remain intact.
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,18 +9,10 @@ Key Changes Made:
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root {
-  --cream: #faf7f2;
-  --warm: #f5efe6;
-  --brown: #2c1810; /* Primary Brand Dark */
-  --gold: #b38b4d;  /* Matched to logo gold */
-  --gold-light: #d4af37;
-  --rust: #a0522d;
-  --text: #1a1208;
-  --muted: #7a6a5a;
-  --border: rgba(44,24,16,0.12);
-  --surface: #ffffff;
-  --shadow: 0 4px 24px rgba(44,24,16,0.08);
-  --shadow-lg: 0 12px 48px rgba(44,24,16,0.14);
+  --cream: #faf7f2; --warm: #f5efe6; --brown: #2c1810; --gold: #c9873a;
+  --gold-light: #e8a855; --rust: #a0522d; --text: #1a1208; --muted: #7a6a5a;
+  --border: rgba(44,24,16,0.12); --surface: #ffffff;
+  --shadow: 0 4px 24px rgba(44,24,16,0.08); --shadow-lg: 0 12px 48px rgba(44,24,16,0.14);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Outfit', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
@@ -35,286 +21,105 @@ body { font-family: 'Outfit', sans-serif; background: var(--cream); color: var(-
 nav {
   position: sticky; top: 0; z-index: 500;
   background: rgba(250,247,242,0.92); backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
-  padding: 0 28px; height: 72px; /* Increased slightly for logo */
+  border-bottom: 1px solid var(--border); padding: 0 28px; height: 64px;
   display: flex; align-items: center; justify-content: space-between;
 }
-.logo-container { height: 45px; display: flex; align-items: center; cursor: pointer; }
-.logo-img { height: 100%; width: auto; object-fit: contain; }
-
+.logo { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; color: var(--brown); letter-spacing: -0.5px; }
+.logo span { color: var(--gold); }
 .nav-links { display: flex; gap: 6px; }
 .nav-btn { padding: 8px 18px; border-radius: 8px; border: none; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
 .nav-btn.ghost { background: transparent; color: var(--muted); }
 .nav-btn.ghost:hover { color: var(--brown); background: var(--warm); }
-.nav-btn.primary { background: var(--gold); color: #fff; font-weight: 600; box-shadow: 0 2px 12px rgba(179,139,77,0.35); }
-.nav-btn.primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+.nav-btn.primary { background: var(--gold); color: #fff; font-weight: 600; box-shadow: 0 2px 12px rgba(201,135,58,0.35); }
 
 /* PAGES */
 .page { display: none; }
 .page.active { display: block; }
 
-/* ── BROWSE PAGE ── */
-.browse-layout { display: grid; grid-template-columns: 380px 1fr; min-height: calc(100vh - 72px); }
-
-/* FILTERS SIDEBAR */
-.sidebar {
-  background: var(--surface); border-right: 1px solid var(--border);
-  overflow-y: auto; padding: 22px 20px;
-  position: sticky; top: 72px; height: calc(100vh - 72px);
-}
-.sidebar-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; margin-bottom: 18px; color: var(--brown); }
+/* BROWSE LAYOUT */
+.browse-layout { display: grid; grid-template-columns: 380px 1fr; min-height: calc(100vh - 64px); }
+.sidebar { background: var(--surface); border-right: 1px solid var(--border); overflow-y: auto; padding: 22px 20px; position: sticky; top: 64px; height: calc(100vh - 64px); }
 .filter-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 8px; margin-top: 18px; }
-.filter-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
-.chip { padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border); font-size: 13px; color: var(--muted); cursor: pointer; transition: all 0.18s; background: transparent; font-family: 'Outfit', sans-serif; }
-.chip:hover { border-color: var(--gold); color: var(--gold); }
-.chip.active { background: var(--gold); border-color: var(--gold); color: #fff; font-weight: 600; }
-.range-row { display: flex; gap: 8px; }
-.range-input { flex: 1; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Outfit', sans-serif; font-size: 13px; color: var(--text); background: var(--cream); outline: none; }
-.range-input:focus { border-color: var(--gold); }
-.search-box { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--text); background: var(--warm); outline: none; margin-bottom: 4px; }
-.search-box:focus { border-color: var(--gold); background: #fff; }
-.apply-btn { width: 100%; margin-top: 20px; padding: 12px; background: var(--brown); color: #fff; border: none; border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-.apply-btn:hover { background: var(--gold); }
-.listing-count { font-size: 12px; color: var(--muted); margin-top: 14px; text-align: center; padding-top: 14px; border-top: 1px solid var(--border); }
+.filter-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border); font-size: 13px; color: var(--muted); cursor: pointer; background: transparent; }
+.chip.active { background: var(--gold); border-color: var(--gold); color: #fff; }
 
-/* MAP + CARDS */
 .map-side { display: flex; flex-direction: column; }
-.map-container { height: 55vh; position: relative; }
+.map-container { height: 45vh; position: relative; }
 #map { width: 100%; height: 100%; }
-
-/* CARDS LIST */
-.cards-area { flex: 1; padding: 20px; overflow-y: auto; background: var(--cream); }
-.cards-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.results-label { font-size: 14px; color: var(--muted); }
-.results-label strong { color: var(--text); }
-.sort-select { padding: 7px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Outfit', sans-serif; font-size: 13px; background: #fff; color: var(--text); outline: none; cursor: pointer; }
+.cards-area { flex: 1; padding: 20px; background: var(--cream); }
 .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
 
-/* PROPERTY CARD */
-.prop-card {
-  background: #fff; border-radius: 16px; overflow: hidden;
-  box-shadow: var(--shadow); transition: all 0.25s; cursor: pointer;
-  border: 1.5px solid transparent;
-}
-.prop-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--gold); }
-.prop-card.highlighted { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(179,139,77,0.2), var(--shadow-lg); }
-.card-img { height: 180px; display: flex; align-items: center; justify-content: center; font-size: 64px; position: relative; overflow: hidden; }
-.card-badge { position: absolute; top: 12px; left: 12px; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; }
-.badge-sale { background: #e74c3c; color: #fff; }
-.badge-rent { background: #2980b9; color: #fff; }
-.badge-new { background: var(--gold); color: #fff; }
-.card-fav { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-.card-fav:hover { background: #fff; transform: scale(1.1); }
-.card-body { padding: 16px; }
-.card-price { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--brown); }
-.card-price span { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 400; color: var(--muted); }
-.card-title { font-size: 14px; font-weight: 600; margin: 4px 0 2px; color: var(--text); }
-.card-loc { font-size: 12px; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 4px; }
-.card-specs { display: flex; gap: 14px; }
-.spec { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
-.spec strong { color: var(--text); font-weight: 600; }
+/* PROMOTED BADGE */
+.badge-featured { background: var(--brown); color: var(--gold-light); border: 1px solid var(--gold); }
 
-/* ── POST AD PAGE ── */
+/* POST AD STYLES */
 .post-wrap { max-width: 760px; margin: 0 auto; padding: 40px 20px 80px; }
-.post-hero { text-align: center; margin-bottom: 40px; }
-.post-hero h1 { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 900; color: var(--brown); margin-bottom: 8px; }
-.post-hero p { color: var(--muted); font-size: 15px; }
 .form-card { background: #fff; border-radius: 20px; padding: 32px; box-shadow: var(--shadow); margin-bottom: 20px; border: 1px solid var(--border); }
-.form-section-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--brown); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .form-group { display: flex; flex-direction: column; gap: 6px; }
 .form-group.full { grid-column: 1/-1; }
-label { font-size: 13px; font-weight: 600; color: var(--text); }
-input[type=text], input[type=number], input[type=tel], input[type=email], select, textarea {
-  padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 10px;
-  font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--text);
-  background: var(--cream); outline: none; transition: border-color 0.2s;
-  width: 100%;
-}
-input:focus, select:focus, textarea:focus { border-color: var(--gold); background: #fff; }
-.submit-btn { width: 100%; padding: 16px; background: var(--brown); color: #fff; border: none; border-radius: 12px; font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; cursor: pointer; transition: all 0.25s; margin-top: 10px; }
-.submit-btn:hover { background: var(--gold); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(179,139,77,0.4); }
+input, select, textarea { padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-family: 'Outfit', sans-serif; background: var(--cream); outline: none; width: 100%; }
 
-/* SUCCESS */
-.success-overlay {
-  position: fixed; inset: 0; z-index: 9000;
-  background: rgba(250,247,242,0.95); backdrop-filter: blur(10px);
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none; transition: opacity 0.4s;
-}
-.success-overlay.show { opacity: 1; pointer-events: all; }
+/* PHOTO PREVIEW */
+.photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
+.preview-item { width: 100px; height: 100px; border-radius: 10px; overflow: hidden; position: relative; border: 1px solid var(--border); }
+.preview-item img { width: 100%; height: 100%; object-fit: cover; }
+.remove-pic { position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.5); color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 12px; }
 
-/* ── LANDING PAGE ── */
-.landing-hero {
-  background: linear-gradient(160deg, #2c1810 0%, #4a2c1a 40%, #2c1810 100%);
-  padding: 90px 28px 80px; text-align: center; position: relative; overflow: hidden;
-}
-.landing-hero::before {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 60% 40%, rgba(179,139,77,0.2) 0%, transparent 60%),
-              radial-gradient(ellipse at 20% 80%, rgba(179,139,77,0.1) 0%, transparent 50%);
-}
-.landing-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(36px,6vw,64px); font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 16px; position: relative; }
-.landing-hero h1 em { font-style: normal; color: var(--gold-light); }
-.landing-hero p { color: rgba(255,255,255,0.7); font-size: 17px; max-width: 500px; margin: 0 auto 36px; line-height: 1.7; position: relative; }
-.hero-search {
-  max-width: 600px; margin: 0 auto; position: relative;
-  display: flex; gap: 10px; background: #fff; padding: 8px; border-radius: 14px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.3);
-}
-.hero-search input { flex: 1; border: none; background: transparent; padding: 8px 12px; font-family: 'Outfit', sans-serif; font-size: 15px; color: var(--text); outline: none; }
-.hero-search button { background: var(--gold); color: #fff; border: none; padding: 10px 22px; border-radius: 9px; font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: background 0.2s; }
-.hero-search button:hover { background: var(--gold-light); }
+/* PREMIUM SECTION */
+.promo-box { border: 2px solid var(--border); border-radius: 12px; padding: 15px; cursor: pointer; transition: 0.3s; position: relative; }
+.promo-box:hover { border-color: var(--gold); }
+.promo-box.selected { border-color: var(--gold); background: rgba(201,135,58,0.05); }
+.promo-price { color: var(--gold); font-weight: 700; font-size: 18px; float: right; }
+.promo-tag { font-size: 11px; text-transform: uppercase; color: var(--muted); font-weight: 700; }
 
-.landing-cats { padding: 60px 28px; max-width: 1100px; margin: 0 auto; }
-.landing-cats h2 { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 800; color: var(--brown); text-align: center; margin-bottom: 8px; }
-.landing-cats p { text-align: center; color: var(--muted); margin-bottom: 36px; font-size: 15px; }
-.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
-.cat-card {
-  background: #fff; border-radius: 16px; padding: 24px 16px;
-  text-align: center; cursor: pointer; transition: all 0.25s;
-  border: 1.5px solid var(--border); box-shadow: var(--shadow);
-}
-.cat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--gold); }
-.cat-icon { font-size: 36px; margin-bottom: 10px; }
-.cat-name { font-weight: 600; font-size: 14px; color: var(--text); }
-.cat-count { font-size: 12px; color: var(--muted); margin-top: 3px; }
+/* MODALS */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+.modal-overlay.active { display: flex; }
+.pay-modal { background: #fff; border-radius: 20px; padding: 30px; width: 100%; max-width: 450px; }
 
-/* MODAL & TOAST REMAIN SAME */
-.toast {
-  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
-  background: var(--brown); color: #fff;
-  padding: 14px 20px; border-radius: 12px; font-size: 14px;
-  transform: translateY(100px); opacity: 0; transition: all 0.3s;
-  max-width: 300px; box-shadow: var(--shadow-lg);
-}
-.toast.show { transform: translateY(0); opacity: 1; }
-
-@media (max-width: 768px) {
-  .browse-layout { grid-template-columns: 1fr; }
-  .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
-  .map-container { height: 40vh; }
-  nav { padding: 0 14px; }
-}
+/* UTILS */
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--brown); color: #fff; padding: 12px 24px; border-radius: 30px; z-index: 2000; display: none; }
 </style>
 </head>
 <body>
 
 <nav>
-  <div class="logo-container" onclick="showPage('home')">
-    <img src="https://i.ibb.co/hR08m8fD/infinitzy-logo.png" alt="Infinitzy Logo" class="logo-img">
-  </div>
+  <div class="logo" onclick="showPage('home')" style="cursor:pointer">Infinit<span>zy</span></div>
   <div class="nav-links">
-    <button class="nav-btn ghost" onclick="showPage('home')">Home</button>
-    <button class="nav-btn ghost" onclick="showPage('browse')">Browse Ads</button>
+    <button class="nav-btn ghost" onclick="showPage('browse')">Browse</button>
     <button class="nav-btn primary" onclick="showPage('post')">+ Post Ad</button>
   </div>
 </nav>
 
 <div id="page-home" class="page active">
-  <div class="landing-hero">
-    <h1>Find Your Dream<br>Property in <em>Sri Lanka</em></h1>
-    <p>Browse thousands of homes, lands, and commercial spaces — all across the island, powered by local sellers.</p>
-    <div class="hero-search">
-      <input type="text" id="heroSearch" placeholder="Search by city, district or property type…">
-      <button onclick="doHeroSearch()">Search</button>
-    </div>
-    <div class="hero-stats">
-      <div class="h-stat" style="text-align: center; margin-top: 50px; display: inline-block; margin-right: 40px;">
-        <div class="h-stat-val" id="listingStatCount" style="font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 900; color: var(--gold-light);">12</div>
-        <div class="h-stat-label" style="color: rgba(255,255,255,0.6); font-size: 13px;">Active Listings</div>
-      </div>
-      <div class="h-stat" style="text-align: center; display: inline-block; margin-right: 40px;">
-        <div class="h-stat-val" style="font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 900; color: var(--gold-light);">25</div>
-        <div class="h-stat-label" style="color: rgba(255,255,255,0.6); font-size: 13px;">Districts</div>
-      </div>
-      <div class="h-stat" style="text-align: center; display: inline-block;">
-        <div class="h-stat-val" style="font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 900; color: var(--gold-light);">100%</div>
-        <div class="h-stat-label" style="color: rgba(255,255,255,0.6); font-size: 13px;">Free to Post</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="landing-cats">
-    <h2>Browse by Category</h2>
-    <p>Find exactly what you're looking for across Sri Lanka</p>
-    <div class="cat-grid">
-      <div class="cat-card" onclick="filterAndBrowse('House')"><div class="cat-icon">🏠</div><div class="cat-name">Houses</div><div class="cat-count" id="cnt-house">— listings</div></div>
-      <div class="cat-card" onclick="filterAndBrowse('Apartment')"><div class="cat-icon">🏢</div><div class="cat-name">Apartments</div><div class="cat-count" id="cnt-apt">— listings</div></div>
-      <div class="cat-card" onclick="filterAndBrowse('Land')"><div class="cat-icon">🌿</div><div class="cat-name">Land</div><div class="cat-count" id="cnt-land">— listings</div></div>
-      <div class="cat-card" onclick="filterAndBrowse('Villa')"><div class="cat-icon">🏡</div><div class="cat-name">Villas</div><div class="cat-count" id="cnt-villa">— listings</div></div>
-      <div class="cat-card" onclick="filterAndBrowse('Commercial')"><div class="cat-icon">🏪</div><div class="cat-name">Commercial</div><div class="cat-count" id="cnt-comm">— listings</div></div>
-      <div class="cat-card" onclick="filterAndBrowse('Room')"><div class="cat-icon">🛏️</div><div class="cat-name">Rooms</div><div class="cat-count" id="cnt-room">— listings</div></div>
-    </div>
-  </div>
-
-  <div class="landing-cta">
-    <h2>Have a property to sell or rent?</h2>
-    <p>Post your ad for free and reach thousands of buyers across Sri Lanka.</p>
-    <div class="cta-btns">
-      <button class="nav-btn primary" style="font-size:15px;padding:12px 28px" onclick="showPage('post')">+ Post Free Ad</button>
-      <button class="nav-btn ghost" style="font-size:15px;padding:12px 28px;border:1.5px solid var(--border)" onclick="showPage('browse')">Browse All Listings</button>
-    </div>
+  <div style="background: var(--brown); color: #fff; padding: 100px 20px; text-align: center;">
+    <h1 style="font-family: 'Playfair Display'; font-size: 48px;">Elevate Your Real Estate Journey</h1>
+    <p style="opacity: 0.8; margin: 20px 0 40px;">The most trusted property marketplace in Sri Lanka.</p>
+    <button class="nav-btn primary" style="padding: 15px 40px; font-size: 18px;" onclick="showPage('browse')">Start Exploring</button>
   </div>
 </div>
 
 <div id="page-browse" class="page">
   <div class="browse-layout">
     <div class="sidebar">
-      <div class="sidebar-title">🔍 Filter Properties</div>
-      <input type="text" class="search-box" id="browseSearch" placeholder="Search location, title…" oninput="applyFilters()">
-
-      <div class="filter-label">Listing Type</div>
-      <div class="filter-chips" id="typeChips">
-        <div class="chip active" onclick="toggleChip(this,'type')">All</div>
-        <div class="chip" onclick="toggleChip(this,'type')">For Sale</div>
-        <div class="chip" onclick="toggleChip(this,'type')">For Rent</div>
-      </div>
-
-      <div class="filter-label">Property Type</div>
-      <div class="filter-chips" id="propChips">
-        <div class="chip active" onclick="toggleChip(this,'prop')">All</div>
-        <div class="chip" onclick="toggleChip(this,'prop')">House</div>
-        <div class="chip" onclick="toggleChip(this,'prop')">Apartment</div>
-        <div class="chip" onclick="toggleChip(this,'prop')">Land</div>
-        <div class="chip" onclick="toggleChip(this,'prop')">Villa</div>
-        <div class="chip" onclick="toggleChip(this,'prop')">Commercial</div>
-        <div class="chip" onclick="toggleChip(this,'prop')">Room</div>
-      </div>
-
+      <h3 style="font-family: 'Playfair Display'; margin-bottom: 20px;">Filters</h3>
+      <input type="text" placeholder="Search locality..." id="searchKey" oninput="applyFilters()">
+      
       <div class="filter-label">District</div>
-      <div class="filter-chips" id="distChips">
-        <div class="chip active" onclick="toggleChip(this,'dist')">All</div>
-        <div class="chip" onclick="toggleChip(this,'dist')">Colombo</div>
-        <div class="chip" onclick="toggleChip(this,'dist')">Galle</div>
-        <div class="chip" onclick="toggleChip(this,'dist')">Kandy</div>
-        <div class="chip" onclick="toggleChip(this,'dist')">Negombo</div>
-        <div class="chip" onclick="toggleChip(this,'dist')">Jaffna</div>
-        <div class="chip" onclick="toggleChip(this,'dist')">Gampaha</div>
+      <div class="filter-chips">
+        <div class="chip active" onclick="setDist('All', this)">All</div>
+        <div class="chip" onclick="setDist('Colombo', this)">Colombo</div>
+        <div class="chip" onclick="setDist('Galle', this)">Galle</div>
+        <div class="chip" onclick="setDist('Kandy', this)">Kandy</div>
       </div>
-
-      <div class="filter-label">Price Range (LKR)</div>
-      <div class="range-row">
-        <input type="number" class="range-input" id="minPrice" placeholder="Min" oninput="applyFilters()">
-        <input type="number" class="range-input" id="maxPrice" placeholder="Max" oninput="applyFilters()">
-      </div>
-
-      <button class="apply-btn" onclick="resetFilters()">Reset Filters</button>
-      <div class="listing-count" id="listingCount">Showing all listings</div>
     </div>
 
     <div class="map-side">
       <div class="map-container"><div id="map"></div></div>
       <div class="cards-area">
-        <div class="cards-header">
-          <div class="results-label"><strong id="resultCount">0</strong> properties found</div>
-          <select class="sort-select" onchange="applyFilters()" id="sortSelect">
-            <option value="newest">Newest First</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-          </select>
-        </div>
-        <div class="cards-grid" id="cardsGrid"></div>
+        <div class="cards-grid" id="mainGrid"></div>
       </div>
     </div>
   </div>
@@ -322,128 +127,231 @@ input:focus, select:focus, textarea:focus { border-color: var(--gold); backgroun
 
 <div id="page-post" class="page">
   <div class="post-wrap">
-    <div class="post-hero">
-      <h1>Post Your Property Ad</h1>
-      <p>Free listing — reach thousands of buyers and renters across Sri Lanka</p>
-    </div>
-
+    <h1 style="font-family: 'Playfair Display'; margin-bottom: 30px; text-align: center;">Create Your Listing</h1>
+    
     <div class="form-card">
-      <div class="form-section-title">🏷️ Listing Type</div>
-      <div class="type-selector" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;" id="listingTypeSelect">
-        <div class="type-opt selected" style="padding: 14px 10px; border: 2px solid var(--border); border-radius: 12px; text-align: center; cursor: pointer;" onclick="selectType(this,'For Sale')"><span style="font-size: 28px; display: block;">💰</span><span style="font-weight: 600;">For Sale</span></div>
-        <div class="type-opt" style="padding: 14px 10px; border: 2px solid var(--border); border-radius: 12px; text-align: center; cursor: pointer;" onclick="selectType(this,'For Rent')"><span style="font-size: 28px; display: block;">🔑</span><span style="font-weight: 600;">For Rent</span></div>
-        <div class="type-opt" style="padding: 14px 10px; border: 2px solid var(--border); border-radius: 12px; text-align: center; cursor: pointer;" onclick="selectType(this,'Lease')"><span style="font-size: 28px; display: block;">📋</span><span style="font-weight: 600;">Lease</span></div>
-      </div>
-    </div>
-
-    <div class="form-card">
-      <div class="form-section-title">🏠 Property Details</div>
+      <h3 style="margin-bottom: 20px;">Basic Information</h3>
       <div class="form-grid">
-        <div class="form-group full"><label>Ad Title *</label><input type="text" id="f-title" placeholder="e.g. 3BR House in Galle"></div>
-        <div class="form-group"><label>Property Type *</label><select id="f-proptype"><option value="">Select type…</option><option>House</option><option>Apartment</option><option>Land</option><option>Villa</option><option>Commercial</option><option>Room</option></select></div>
-        <div class="form-group"><label>Price (LKR) *</label><input type="number" id="f-price" placeholder="e.g. 15000000"></div>
-        <div class="form-group full"><label>Description *</label><textarea id="f-desc" placeholder="Describe highlights..."></textarea></div>
+        <div class="form-group full"><label>Ad Title</label><input type="text" id="p-title"></div>
+        <div class="form-group">
+            <label>Price (LKR)</label>
+            <input type="number" id="p-price">
+        </div>
+        <div class="form-group">
+            <label>District</label>
+            <select id="p-dist">
+                <option>Colombo</option><option>Galle</option><option>Kandy</option><option>Matara</option>
+            </select>
+        </div>
       </div>
-      <div class="form-grid" style="margin-top:15px">
-        <div class="form-group"><label>District *</label><select id="f-district" onchange="updateMapPin()"><option>Colombo</option><option>Galle</option><option>Kandy</option><option>Gampaha</option></select></div>
-        <div class="form-group"><label>City / Area *</label><input type="text" id="f-city" placeholder="e.g. Unawatuna"></div>
-      </div>
-      <button class="submit-btn" onclick="submitAd()">🏠 Publish Ad Free</button>
     </div>
+
+    <div class="form-card">
+      <h3 style="margin-bottom: 10px;">Property Photos</h3>
+      <p style="font-size: 13px; color: var(--muted); margin-bottom: 15px;">Add up to 5 photos from your device.</p>
+      <input type="file" id="fileInput" multiple accept="image/*" style="display: none;" onchange="handleFiles(this.files)">
+      <button class="nav-btn ghost" style="border: 2px dashed var(--border); width: 100%; height: 80px;" onclick="document.getElementById('fileInput').click()">
+        Click to Browse Photos
+      </button>
+      <div class="photo-grid" id="photoGrid"></div>
+    </div>
+
+    <div class="form-card">
+      <h3 style="margin-bottom: 20px;">Boost Your Ad (Featured & Top Ads)</h3>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="promo-box" id="promo-free" onclick="selectPromo('Free', 0)">
+          <span class="promo-price">FREE</span>
+          <span class="promo-tag">Standard</span>
+          <div style="font-weight: 600;">Basic Listing</div>
+          <p style="font-size: 12px; color: var(--muted);">Standard placement in search results.</p>
+        </div>
+        <div class="promo-box" id="promo-top" onclick="selectPromo('Top Ad', 2500)">
+          <span class="promo-price">Rs. 2,500</span>
+          <span class="promo-tag">Popular</span>
+          <div style="font-weight: 600;">⭐ Top Ad</div>
+          <p style="font-size: 12px; color: var(--muted);">Stay at the top of the category for 7 days.</p>
+        </div>
+        <div class="promo-box" id="promo-feat" onclick="selectPromo('Featured', 5000)">
+          <span class="promo-price">Rs. 5,000</span>
+          <span class="promo-tag">Premium</span>
+          <div style="font-weight: 600;">💎 Featured Listing</div>
+          <p style="font-size: 12px; color: var(--muted);">Highlighted background + priority map placement.</p>
+        </div>
+      </div>
+    </div>
+
+    <button class="nav-btn primary" style="width: 100%; padding: 18px;" onclick="initPublish()">Proceed to Publish</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="payModal">
+  <div class="pay-modal">
+    <h2 style="font-family: 'Playfair Display'; margin-bottom: 10px;">Secure Checkout</h2>
+    <p style="color: var(--muted); margin-bottom: 20px;">Amount Due: <strong id="payAmount" style="color: var(--brown);">Rs. 0</strong></p>
+    
+    <div class="form-group" style="margin-bottom: 15px;">
+      <label>Card Number</label>
+      <input type="text" placeholder="xxxx xxxx xxxx xxxx">
+    </div>
+    <div class="form-grid" style="margin-bottom: 25px;">
+      <div class="form-group"><label>Expiry</label><input type="text" placeholder="MM/YY"></div>
+      <div class="form-group"><label>CVC</label><input type="password" placeholder="***"></div>
+    </div>
+    
+    <div style="display: flex; gap: 10px;">
+      <button class="nav-btn ghost" style="flex: 1;" onclick="closePayment()">Cancel</button>
+      <button class="nav-btn primary" style="flex: 2;" onclick="processPayment()">Pay & Publish</button>
+    </div>
+    <p style="text-align: center; font-size: 11px; margin-top: 15px; color: var(--muted);">🔒 Encrypted by Infinitzy Pay</p>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// Logic remains unchanged to ensure full functionality
-const DISTRICTS = { 'Colombo': [6.9271, 79.8612], 'Galle': [6.0535, 80.2210], 'Kandy': [7.2906, 80.6337], 'Gampaha': [7.0917, 80.0008] };
-const emojis = { House:'🏠', Apartment:'🏢', Land:'🌿', Villa:'🏡', Commercial:'🏪', Room:'🛏️' };
-const gradients = { House:'#2c4a2e,#1a3020', Apartment:'#1a2c4a,#0d1e30', Land:'#2a3a1a,#1a2c0d' };
-
 let listings = [
-  { id:1, title:'Modern 3BR House in Colombo', type:'For Sale', propType:'House', price:28500000, beds:3, baths:2, district:'Colombo', city:'Colombo 7', lat:6.9028, lng:79.8668, posted: Date.now() },
-  { id:2, title:'Beach Villa Galle', type:'For Sale', propType:'Villa', price:95000000, beds:4, baths:3, district:'Galle', city:'Unawatuna', lat:6.0109, lng:80.2486, posted: Date.now() }
+  { id: 1, title: 'Sea View Penthouse', price: 45000000, dist: 'Colombo', promo: 'Featured', lat: 6.9271, lng: 79.8612 },
+  { id: 2, title: 'Cozy Kandy Bungalow', price: 12000000, dist: 'Kandy', promo: 'Top Ad', lat: 7.2906, lng: 80.6337 },
+  { id: 3, title: 'Galle Fort Heritage House', price: 85000000, dist: 'Galle', promo: 'Free', lat: 6.0535, lng: 80.2210 }
 ];
 
-let activeFilters = { type:'All', prop:'All', dist:'All', search:'', sort:'newest' };
-let map, markers = [];
+let map;
+let uploadedPhotos = [];
+let selectedPromoLevel = 'Free';
+let selectedPromoPrice = 0;
+let currentDistFilter = 'All';
 
+// NAVIGATION
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  if (id === 'browse') { setTimeout(initMap, 100); applyFilters(); }
-  window.scrollTo(0,0);
+  document.getElementById('page-' + id).classList.add('active');
+  if(id === 'browse') initMap();
 }
 
+// MAP
 function initMap() {
-  if (map) { map.invalidateSize(); return; }
+  if (map) return;
   map = L.map('map').setView([7.8731, 80.7718], 7);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-  renderMapMarkers();
-}
-
-function renderMapMarkers() {
-  markers.forEach(m => map.removeLayer(m));
-  getFiltered().forEach(l => {
-    const m = L.marker([l.lat, l.lng]).addTo(map).bindPopup(`<b>${l.title}</b><br>LKR ${l.price.toLocaleString()}`);
-    markers.push(m);
-  });
-}
-
-function applyFilters() {
-  const filtered = getFiltered();
-  const grid = document.getElementById('cardsGrid');
-  grid.innerHTML = filtered.map(l => `
-    <div class="prop-card">
-      <div class="card-img" style="background:#2c1810; color:white">${emojis[l.propType]||'🏠'}</div>
-      <div class="card-body">
-        <div class="card-price">LKR ${l.price.toLocaleString()}</div>
-        <div class="card-title">${l.title}</div>
-        <div class="card-loc">📍 ${l.city}</div>
-      </div>
-    </div>
-  `).join('');
-  document.getElementById('resultCount').textContent = filtered.length;
-  if(map) renderMapMarkers();
-}
-
-function getFiltered() {
-  return listings.filter(l => {
-    if (activeFilters.type !== 'All' && l.type !== activeFilters.type) return false;
-    if (activeFilters.dist !== 'All' && l.district !== activeFilters.dist) return false;
-    return true;
-  });
-}
-
-function toggleChip(el, group) {
-  el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  activeFilters[group] = el.textContent;
   applyFilters();
 }
 
-function doHeroSearch() {
-  activeFilters.search = document.getElementById('heroSearch').value.toLowerCase();
+// PHOTO HANDLING
+function handleFiles(files) {
+  const grid = document.getElementById('photoGrid');
+  Array.from(files).forEach(file => {
+    if (uploadedPhotos.length >= 5) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      uploadedPhotos.push(e.target.result);
+      const div = document.createElement('div');
+      div.className = 'preview-item';
+      div.innerHTML = `<img src="${e.target.result}"><button class="remove-pic" onclick="removePhoto(this, '${e.target.result}')">×</button>`;
+      grid.appendChild(div);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function removePhoto(btn, src) {
+  btn.parentElement.remove();
+  uploadedPhotos = uploadedPhotos.filter(p => p !== src);
+}
+
+// PROMOTION SELECTION
+function selectPromo(level, price) {
+  selectedPromoLevel = level;
+  selectedPromoPrice = price;
+  document.querySelectorAll('.promo-box').forEach(b => b.classList.remove('selected'));
+  const id = level === 'Free' ? 'promo-free' : level === 'Top Ad' ? 'promo-top' : 'promo-feat';
+  document.getElementById(id).classList.add('selected');
+}
+
+// PUBLISHING & PAYMENT
+function initPublish() {
+  if (!document.getElementById('p-title').value) return showToast("Please enter a title");
+  
+  if (selectedPromoPrice > 0) {
+    document.getElementById('payAmount').innerText = `Rs. ${selectedPromoPrice.toLocaleString()}`;
+    document.getElementById('payModal').classList.add('active');
+  } else {
+    finishPosting();
+  }
+}
+
+function closePayment() { document.getElementById('payModal').classList.remove('active'); }
+
+function processPayment() {
+  showToast("Processing Payment...");
+  setTimeout(() => {
+    closePayment();
+    finishPosting();
+  }, 2000);
+}
+
+function finishPosting() {
+  const newAd = {
+    id: Date.now(),
+    title: document.getElementById('p-title').value,
+    price: parseInt(document.getElementById('p-price').value),
+    dist: document.getElementById('p-dist').value,
+    promo: selectedPromoLevel,
+    lat: 6.9, lng: 79.8 // Defaulting for demo
+  };
+  listings.unshift(newAd);
+  showToast("Listing Published Successfully!");
   showPage('browse');
 }
 
-function submitAd() {
-  showToast("Listing Published Successfully!");
-  showPage('home');
+// FILTERING & RENDERING
+function setDist(d, el) {
+  currentDistFilter = d;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+}
+
+function applyFilters() {
+  const query = document.getElementById('searchKey').value.toLowerCase();
+  
+  // Sorting: Featured > Top Ad > Free
+  const sorted = [...listings].sort((a,b) => {
+    const rank = { 'Featured': 3, 'Top Ad': 2, 'Free': 1 };
+    return rank[b.promo] - rank[a.promo];
+  });
+
+  const filtered = sorted.filter(l => {
+    const matchDist = currentDistFilter === 'All' || l.dist === currentDistFilter;
+    const matchSearch = l.title.toLowerCase().includes(query);
+    return matchDist && matchSearch;
+  });
+
+  renderCards(filtered);
+}
+
+function renderCards(data) {
+  const grid = document.getElementById('mainGrid');
+  grid.innerHTML = data.map(l => `
+    <div class="prop-card" style="background:#fff; border-radius:15px; overflow:hidden; border: 1.5px solid ${l.promo==='Featured' ? 'var(--gold)' : 'var(--border)'}; padding: 15px; position:relative;">
+      ${l.promo !== 'Free' ? `<div style="position:absolute; top:10px; left:10px; padding:3px 8px; border-radius:5px; font-size:10px; font-weight:700;" class="${l.promo==='Featured' ? 'badge-featured' : 'nav-btn primary'}">${l.promo.toUpperCase()}</div>` : ''}
+      <div style="height:150px; background:#eee; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:40px;">🏘️</div>
+      <h4 style="margin-top:10px;">${l.title}</h4>
+      <p style="color:var(--gold); font-weight:700;">Rs. ${l.price.toLocaleString()}</p>
+      <p style="font-size:12px; color:var(--muted);">📍 ${l.dist}</p>
+    </div>
+  `).join('');
 }
 
 function showToast(msg) {
-  const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3000);
+  const t = document.getElementById('toast');
+  t.innerText = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
 }
 
-function updateHomeCounts() {
-  document.getElementById('listingStatCount').textContent = listings.length;
-}
-
-updateHomeCounts();
+// INITIALIZE
+selectPromo('Free', 0);
 </script>
+
 </body>
 </html>
-

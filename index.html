@@ -2,85 +2,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Infinitzy — Advanced Marketplace</title><style>
-/* NEW ADDITIONS */
-.top-ads {padding:15px;background:#fff;border-bottom:1px solid #ddd;display:flex;gap:10px;overflow:auto}
-.top-ad {min-width:220px;padding:10px;border:2px solid gold;border-radius:10px;background:#fff7e6}
-.featured-badge {position:absolute;top:10px;right:10px;background:gold;color:#000;padding:3px 8px;font-size:11px;border-radius:5px}
-.payment-box {background:#fff;padding:20px;border-radius:12px;border:1px solid #ddd;margin-top:20px}
+<title>Infinitzy — Full Marketplace</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"><style>
+/* KEEP ORIGINAL UI + ADDITIONS */
+body{font-family:'Outfit',sans-serif;background:#faf7f2;margin:0}
+
+/* NEW FEATURES */
+.top-ads{display:flex;gap:10px;padding:10px;overflow:auto;background:#fff;border-bottom:1px solid #ddd}
+.top-ad{min-width:220px;background:#fff7e6;border:2px solid gold;border-radius:12px;padding:10px;font-weight:600}
+.featured{border:2px solid gold !important;position:relative}
+.featured::after{content:'FEATURED';position:absolute;top:8px;right:8px;background:gold;padding:3px 8px;font-size:10px;border-radius:5px}
+.payment-box{background:#fff;padding:20px;border-radius:12px;border:1px solid #ddd;margin-top:20px}
+
+.card{background:#fff;margin:10px;padding:15px;border-radius:12px;border:1px solid #ddd}
 </style></head>
-<body><h2>Top Ads (Paid)</h2>
-<div class="top-ads" id="topAds"></div><h2>All Listings</h2>
-<div id="listings"></div><h2>Post Ad</h2>
-<input type="file" id="fileInput" multiple accept="image/*" capture="environment">
+<body><h2 style="padding:10px">🔥 Top Ads</h2>
+<div class="top-ads" id="topAds"></div><h2 style="padding:10px">🏠 Listings</h2>
+<div id="list"></div><h2 style="padding:10px">➕ Post Ad</h2>
+<div style="padding:10px">
+<input type="text" id="title" placeholder="Title"><br><br>
+<input type="file" id="photos" multiple accept="image/*" capture="environment"><br><br>
 <div id="preview"></div><div class="payment-box">
-<h3>Upgrade Ad</h3>
+<h3>Choose Plan</h3>
 <select id="plan">
 <option value="free">Free</option>
 <option value="featured">Featured (LKR 500)</option>
 <option value="top">Top Ad (LKR 1000)</option>
 </select>
-<button onclick="payNow()">Pay Now</button>
+<br><br>
+<button onclick="publishAd()">Publish Ad</button>
+</div>
 </div><script>
-let ads = [];
+let ads=[];
 
-// IMAGE BROWSING (DEVICE)
-document.getElementById('fileInput').addEventListener('change', function(e){
-  const preview = document.getElementById('preview');
-  preview.innerHTML = '';
-  Array.from(e.target.files).forEach(file=>{
-    const reader = new FileReader();
-    reader.onload = function(ev){
-      const img = document.createElement('img');
-      img.src = ev.target.result;
-      img.style.width='80px';
-      img.style.margin='5px';
-      preview.appendChild(img);
-    }
-    reader.readAsDataURL(file);
-  })
+// IMAGE UPLOAD
+document.getElementById('photos').addEventListener('change',function(e){
+ let preview=document.getElementById('preview');
+ preview.innerHTML='';
+ Array.from(e.target.files).forEach(file=>{
+   let reader=new FileReader();
+   reader.onload=function(ev){
+     let img=document.createElement('img');
+     img.src=ev.target.result;
+     img.style.width='80px';
+     img.style.margin='5px';
+     preview.appendChild(img);
+   }
+   reader.readAsDataURL(file);
+ });
 });
 
-// ADD SAMPLE AD
-function addAd(title, plan){
-  ads.push({title, plan});
-  renderAds();
+function publishAd(){
+ let title=document.getElementById('title').value;
+ let plan=document.getElementById('plan').value;
+ 
+ if(!title){alert('Enter title');return;}
+ 
+ // simulate payment
+ if(plan!='free'){
+   alert('Payment successful for '+plan);
+ }
+ 
+ ads.push({title,plan});
+ render();
 }
 
-function renderAds(){
-  const list = document.getElementById('listings');
-  const top = document.getElementById('topAds');
-  list.innerHTML='';
-  top.innerHTML='';
+function render(){
+ let list=document.getElementById('list');
+ let top=document.getElementById('topAds');
+ list.innerHTML='';
+ top.innerHTML='';
 
-  ads.forEach(a=>{
-    const div=document.createElement('div');
-    div.style.position='relative';
-    div.style.border='1px solid #ccc';
-    div.style.margin='10px';
-    div.style.padding='10px';
-    div.innerHTML=a.title;
+ // sort priority
+ let sorted=[...ads].sort((a,b)=>{
+   let order={top:1,featured:2,free:3};
+   return order[a.plan]-order[b.plan];
+ });
 
-    if(a.plan==='featured'){
-      div.innerHTML += '<div class="featured-badge">FEATURED</div>';
-    }
+ sorted.forEach(ad=>{
+   let div=document.createElement('div');
+   div.className='card';
+   div.innerHTML=ad.title;
 
-    if(a.plan==='top'){
-      const t=document.createElement('div');
-      t.className='top-ad';
-      t.innerHTML=a.title + ' ⭐';
-      top.appendChild(t);
-    }
+   if(ad.plan==='featured') div.classList.add('featured');
 
-    list.appendChild(div);
-  });
-}
+   if(ad.plan==='top'){
+     let t=document.createElement('div');
+     t.className='top-ad';
+     t.innerHTML=ad.title+' ⭐';
+     top.appendChild(t);
+   }
 
-// PAYMENT SIMULATION
-function payNow(){
-  const plan=document.getElementById('plan').value;
-  alert('Payment Successful for '+plan);
-  addAd('Sample Property '+Math.random().toFixed(2), plan);
+   list.appendChild(div);
+ });
 }
 </script></body>
 </html>

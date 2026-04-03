@@ -1,5 +1,3 @@
-This is the complete, single-file solution. I have fixed the photo upload logic by ensuring the hidden file input is correctly triggered and the FileReader properly renders the thumbnails. I also cleaned up the submitAd function to include your photos in the final object.
-Copy this entire block into a single .html file (e.g., index.html) and open it in your browser.
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,63 +9,97 @@ Copy this entire block into a single .html file (e.g., index.html) and open it i
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root {
-  --cream: #faf7f2; --warm: #f5efe6; --brown: #2c1810; --gold: #c9873a;
-  --gold-light: #e8a855; --text: #1a1208; --muted: #7a6a5a; --border: rgba(44,24,16,0.12);
-  --surface: #ffffff; --shadow: 0 4px 24px rgba(44,24,16,0.08);
+  --cream: #faf7f2;
+  --warm: #f5efe6;
+  --brown: #2c1810;
+  --gold: #c9873a;
+  --gold-light: #e8a855;
+  --rust: #a0522d;
+  --text: #1a1208;
+  --muted: #7a6a5a;
+  --border: rgba(44,24,16,0.12);
+  --surface: #ffffff;
+  --shadow: 0 4px 24px rgba(44,24,16,0.08);
+  --shadow-lg: 0 12px 48px rgba(44,24,16,0.14);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Outfit', sans-serif; background: var(--cream); color: var(--text); }
+body { font-family: 'Outfit', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
 
 /* NAV */
 nav {
-  position: sticky; top: 0; z-index: 1000; background: rgba(250,247,242,0.92);
-  backdrop-filter: blur(16px); border-bottom: 1px solid var(--border);
-  padding: 0 28px; height: 64px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 500;
+  background: rgba(250,247,242,0.92); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px; height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
 }
-.logo { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; color: var(--brown); }
+.logo { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; color: var(--brown); letter-spacing: -0.5px; }
 .logo span { color: var(--gold); }
-.nav-links { display: flex; gap: 8px; }
-.nav-btn { padding: 8px 18px; border-radius: 8px; border: none; font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.2s; }
+.nav-links { display: flex; gap: 6px; }
+.nav-btn { padding: 8px 18px; border-radius: 8px; border: none; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
 .nav-btn.ghost { background: transparent; color: var(--muted); }
-.nav-btn.primary { background: var(--gold); color: #fff; font-weight: 600; }
+.nav-btn.ghost:hover { color: var(--brown); background: var(--warm); }
+.nav-btn.primary { background: var(--gold); color: #fff; font-weight: 600; box-shadow: 0 2px 12px rgba(201,135,58,0.35); }
+.nav-btn.primary:hover { background: var(--gold-light); transform: translateY(-1px); }
 
 /* PAGES */
-.page { display: none; min-height: calc(100vh - 64px); }
+.page { display: none; }
 .page.active { display: block; }
 
-/* BROWSE LAYOUT */
-.browse-layout { display: grid; grid-template-columns: 350px 1fr; height: calc(100vh - 64px); }
-.sidebar { background: #fff; border-right: 1px solid var(--border); padding: 20px; overflow-y: auto; }
-.map-side { display: flex; flex-direction: column; height: 100%; }
-#map { height: 45%; width: 100%; border-bottom: 1px solid var(--border); }
+/* BROWSE PAGE */
+.browse-layout { display: grid; grid-template-columns: 380px 1fr; min-height: calc(100vh - 64px); }
+.sidebar { background: var(--surface); border-right: 1px solid var(--border); overflow-y: auto; padding: 22px 20px; position: sticky; top: 64px; height: calc(100vh - 64px); }
+.sidebar-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; margin-bottom: 18px; color: var(--brown); }
+.filter-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 8px; margin-top: 18px; }
+.filter-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border); font-size: 13px; color: var(--muted); cursor: pointer; transition: all 0.18s; background: transparent; }
+.chip.active { background: var(--gold); border-color: var(--gold); color: #fff; font-weight: 600; }
+.search-box { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 10px; margin-bottom: 4px; }
+.range-row { display: flex; gap: 8px; }
+.range-input { flex: 1; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; }
+.apply-btn { width: 100%; margin-top: 20px; padding: 12px; background: var(--brown); color: #fff; border: none; border-radius: 10px; cursor: pointer; }
+
+/* MAP + CARDS */
+.map-side { display: flex; flex-direction: column; }
+.map-container { height: 55vh; position: relative; }
+#map { width: 100%; height: 100%; }
 .cards-area { flex: 1; padding: 20px; overflow-y: auto; background: var(--cream); }
-.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
 
 /* PROPERTY CARD */
-.prop-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); border: 1.5px solid transparent; cursor: pointer; }
-.card-img-placeholder { height: 150px; background: var(--brown); display: flex; align-items: center; justify-content: center; font-size: 40px; color: #fff; background-size: cover; background-position: center; }
-.card-body { padding: 15px; }
-.card-price { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--gold); }
+.prop-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); cursor: pointer; border: 1.5px solid transparent; }
+.prop-card:hover { transform: translateY(-4px); border-color: var(--gold); }
+.card-img { height: 180px; display: flex; align-items: center; justify-content: center; font-size: 64px; position: relative; }
+.card-body { padding: 16px; }
+.card-price { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; }
 
-/* FORMS */
-.post-wrap { max-width: 700px; margin: 0 auto; padding: 40px 20px; }
-.form-card { background: #fff; border-radius: 16px; padding: 25px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: var(--shadow); }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-.full { grid-column: 1 / -1; }
-label { font-size: 13px; font-weight: 600; margin-bottom: 5px; display: block; }
-input, select, textarea { width: 100%; padding: 10px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--cream); outline: none; font-family: inherit; }
+/* POST AD PAGE */
+.post-wrap { max-width: 760px; margin: 0 auto; padding: 40px 20px 80px; }
+.form-card { background: #fff; border-radius: 20px; padding: 32px; box-shadow: var(--shadow); margin-bottom: 20px; border: 1px solid var(--border); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group.full { grid-column: 1/-1; }
+input, select, textarea { padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 10px; width: 100%; background: var(--cream); outline: none; }
+.photo-drop { border: 2px dashed var(--border); border-radius: 14px; padding: 32px; text-align: center; cursor: pointer; background: var(--warm); transition: 0.2s; }
+.photo-drop:hover { border-color: var(--gold); }
+.photo-previews { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.photo-thumb { width: 80px; height: 80px; border-radius: 10px; border: 1px solid var(--border); position: relative; background-position: center; background-size: cover; }
+.photo-thumb .remove { position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; border-radius: 50%; background: #e74c3c; color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+.submit-btn { width: 100%; padding: 16px; background: var(--brown); color: #fff; border: none; border-radius: 12px; font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+.type-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.type-opt { padding: 14px 10px; border: 2px solid var(--border); border-radius: 12px; text-align: center; cursor: pointer; }
+.type-opt.selected { border-color: var(--gold); background: rgba(201,135,58,0.06); }
+.amenity-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.amenity-opt { padding: 9px 10px; border: 1.5px solid var(--border); border-radius: 8px; text-align: center; cursor: pointer; font-size: 12px; }
+.amenity-opt.selected { background: var(--gold); color: #fff; border-color: var(--gold); }
+.map-pick { height: 240px; border-radius: 12px; border: 1.5px solid var(--border); margin-top: 8px; }
 
-/* PHOTO SYSTEM */
-.photo-drop { border: 2px dashed var(--border); border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; background: var(--warm); transition: 0.2s; }
-.photo-drop:hover { border-color: var(--gold); background: #fff; }
-.photo-previews { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
-.photo-thumb { width: 80px; height: 80px; border-radius: 8px; border: 1px solid var(--border); position: relative; background-size: cover; background-position: center; }
-.photo-thumb .remove { position: absolute; top: -5px; right: -5px; width: 20px; height: 20px; border-radius: 50%; background: #e74c3c; color: #fff; border: none; font-size: 10px; cursor: pointer; }
+/* SUCCESS OVERLAY */
+.success-overlay { position: fixed; inset: 0; z-index: 9000; background: rgba(250,247,242,0.95); display: none; align-items: center; justify-content: center; }
+.success-overlay.show { display: flex; }
 
-/* UTILS */
-.submit-btn { width: 100%; padding: 16px; background: var(--brown); color: #fff; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 16px; }
-.toast { position: fixed; bottom: 20px; right: 20px; background: var(--brown); color: #fff; padding: 12px 20px; border-radius: 8px; opacity: 0; transition: 0.3s; z-index: 10000; }
-.success-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; text-align: center; }
+/* TOAST */
+.toast { position: fixed; bottom: 24px; right: 24px; z-index: 9999; background: var(--brown); color: #fff; padding: 14px 20px; border-radius: 12px; opacity: 0; transform: translateY(20px); transition: 0.3s; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateY(0); }
 </style>
 </head>
 <body>
@@ -76,34 +108,44 @@ input, select, textarea { width: 100%; padding: 10px; border: 1.5px solid var(--
   <div class="logo">Infinit<span>zy</span></div>
   <div class="nav-links">
     <button class="nav-btn ghost" onclick="showPage('home')">Home</button>
-    <button class="nav-btn ghost" onclick="showPage('browse')">Browse</button>
+    <button class="nav-btn ghost" onclick="showPage('browse')">Browse Ads</button>
     <button class="nav-btn primary" onclick="showPage('post')">+ Post Ad</button>
   </div>
 </nav>
 
 <div id="page-home" class="page active">
-  <div style="text-align: center; padding: 100px 20px;">
-    <h1 style="font-family: 'Playfair Display'; font-size: 40px;">Find Your Space in Sri Lanka</h1>
-    <p style="color: var(--muted); margin-top: 10px;">The island's most modern property marketplace.</p>
-    <button class="nav-btn primary" style="margin-top: 20px; padding: 12px 30px;" onclick="showPage('browse')">Explore Now</button>
+  <div style="padding: 100px 20px; text-align: center; background: var(--brown); color: #fff;">
+    <h1 style="font-family: 'Playfair Display'; font-size: 48px;">Find Your Dream Property</h1>
+    <p style="margin-top: 10px; opacity: 0.8;">Sri Lanka's premier eco-friendly real estate platform.</p>
+    <button class="nav-btn primary" style="margin-top: 30px; padding: 15px 40px;" onclick="showPage('browse')">Start Browsing</button>
   </div>
 </div>
 
 <div id="page-browse" class="page">
   <div class="browse-layout">
     <div class="sidebar">
-      <h3>Filters</h3>
-      <input type="text" id="browseSearch" placeholder="Search location..." oninput="renderAll()" style="margin: 15px 0;">
-      <label>District</label>
-      <select id="filterDist" onchange="renderAll()">
-        <option value="All">All Districts</option>
-        <option>Galle</option>
-        <option>Colombo</option>
-        <option>Kandy</option>
-      </select>
+      <div class="sidebar-title">🔍 Filter Properties</div>
+      <input type="text" class="search-box" id="browseSearch" placeholder="Search city or title..." oninput="applyFilters()">
+      
+      <div class="filter-label">District</div>
+      <div class="filter-chips" id="distChips">
+        <div class="chip active" onclick="toggleChip(this,'dist')">All</div>
+        <div class="chip" onclick="toggleChip(this,'dist')">Colombo</div>
+        <div class="chip" onclick="toggleChip(this,'dist')">Galle</div>
+        <div class="chip" onclick="toggleChip(this,'dist')">Kandy</div>
+      </div>
+      
+      <div class="filter-label">Price Range (LKR)</div>
+      <div class="range-row">
+        <input type="number" class="range-input" id="minPrice" placeholder="Min" oninput="applyFilters()">
+        <input type="number" class="range-input" id="maxPrice" placeholder="Max" oninput="applyFilters()">
+      </div>
+      
+      <button class="apply-btn" onclick="resetFilters()">Reset Filters</button>
+      <div style="margin-top: 20px; font-size: 13px; color: var(--muted);" id="listingCount"></div>
     </div>
     <div class="map-side">
-      <div id="map"></div>
+      <div class="map-container"><div id="map"></div></div>
       <div class="cards-area">
         <div class="cards-grid" id="cardsGrid"></div>
       </div>
@@ -114,108 +156,95 @@ input, select, textarea { width: 100%; padding: 10px; border: 1.5px solid var(--
 <div id="page-post" class="page">
   <div class="post-wrap">
     <div class="form-card">
-      <h2 style="margin-bottom: 15px; font-family: 'Playfair Display';">Post Your Ad</h2>
+      <div class="sidebar-title">🏷️ Listing Type</div>
+      <div class="type-selector" id="listingTypeSelect">
+        <div class="type-opt selected" onclick="selectType(this,'For Sale')">💰 For Sale</div>
+        <div class="type-opt" onclick="selectType(this,'For Rent')">🔑 For Rent</div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="sidebar-title">🏠 Property Details</div>
       <div class="form-grid">
-        <div class="form-group full"><label>Ad Title *</label><input type="text" id="f-title" placeholder="e.g. Luxury Villa in Galle"></div>
-        <div class="form-group"><label>Price (LKR) *</label><input type="number" id="f-price"></div>
-        <div class="form-group"><label>District *</label>
-          <select id="f-district" onchange="movePostMap()">
-            <option>Galle</option><option>Colombo</option><option>Kandy</option>
-          </select>
+        <div class="form-group full"><label>Title *</label><input type="text" id="f-title"></div>
+        <div class="form-group">
+            <label>Type *</label>
+            <select id="f-proptype">
+                <option value="House">House</option>
+                <option value="Land">Land</option>
+                <option value="Villa">Villa</option>
+            </select>
         </div>
+        <div class="form-group"><label>Price *</label><input type="number" id="f-price"></div>
+        <div class="form-group"><label>District *</label><select id="f-district" onchange="updateMapPin()"><option>Galle</option><option>Colombo</option></select></div>
+        <div class="form-group"><label>City *</label><input type="text" id="f-city"></div>
+        <div class="form-group full"><label>Description *</label><textarea id="f-desc"></textarea></div>
       </div>
     </div>
 
     <div class="form-card">
-      <label>Pin Location on Map</label>
-      <div id="postMap" style="height: 250px; border-radius: 8px;"></div>
-      <input type="hidden" id="f-lat" value="6.0535"><input type="hidden" id="f-lng" value="80.2210">
+        <div class="sidebar-title">📍 Location</div>
+        <div class="map-pick" id="postMap"></div>
+        <input type="hidden" id="f-lat" value="6.0535">
+        <input type="hidden" id="f-lng" value="80.2210">
     </div>
 
     <div class="form-card">
-      <label>Property Photos</label>
-      <input type="file" id="real-file-input" accept="image/*" multiple style="display: none;">
-      <div class="photo-drop" onclick="document.getElementById('real-file-input').click()">
-        <div style="font-size: 30px;">📸</div>
-        <p>Click to <strong>Upload Photos</strong></p>
-      </div>
-      <div class="photo-previews" id="photoPreviews"></div>
+        <div class="sidebar-title">📷 Photos</div>
+        <input type="file" id="photo-input" accept="image/*" multiple style="display: none;">
+        <div class="photo-drop" onclick="document.getElementById('photo-input').click()">
+            <div style="font-size: 30px;">📸</div>
+            <p>Click to <strong>browse device</strong></p>
+        </div>
+        <div class="photo-previews" id="photoPreviews"></div>
     </div>
 
     <div class="form-card">
-      <div class="form-grid">
-        <div class="form-group"><label>Your Name</label><input type="text" id="f-name"></div>
-        <div class="form-group"><label>Phone Number</label><input type="tel" id="f-phone"></div>
-      </div>
+        <div class="sidebar-title">📞 Contact</div>
+        <div class="form-grid">
+            <input type="text" id="f-name" placeholder="Name">
+            <input type="tel" id="f-phone" placeholder="Phone">
+        </div>
     </div>
 
-    <button class="submit-btn" onclick="submitAd()">Publish Property</button>
+    <button class="submit-btn" onclick="submitAd()">Publish Ad</button>
   </div>
 </div>
 
 <div class="success-overlay" id="successOverlay">
-  <div>
-    <h1>🎉 Success!</h1>
-    <p>Your property is now live.</p><br>
-    <button class="nav-btn primary" onclick="location.reload()">Back to Home</button>
-  </div>
+    <div style="text-align: center; background: #fff; padding: 40px; border-radius: 20px;">
+        <h2>🎉 Ad Published!</h2>
+        <button class="nav-btn primary" onclick="location.reload()">Great!</button>
+    </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// --- STATE ---
+// DATA
 let listings = [
-  { id: 1, title: "Heritage Villa", price: 45000000, dist: "Galle", lat: 6.0367, lng: 80.2170, imgs: [] },
-  { id: 2, title: "City Penthouse", price: 85000000, dist: "Colombo", lat: 6.9271, lng: 79.8612, imgs: [] }
+  { id:1, title:'Modern House Galle', type:'For Sale', propType:'House', price:25000000, district:'Galle', city:'Unawatuna', lat:6.0109, lng:80.2486, posted: Date.now() },
+  { id:2, title:'Colombo Luxury Apt', type:'For Rent', propType:'Apartment', price:150000, district:'Colombo', city:'Colombo 3', lat:6.9271, lng:79.8612, posted: Date.now() }
 ];
-let uploadedImages = [];
-let map, postMap, postMarker, markers = [];
 
-// --- NAVIGATION ---
+let map, postMap, postMarker, markers = [];
+let uploadedImages = [];
+let selectedType = 'For Sale';
+
+// NAVIGATION
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  if (id === 'browse') setTimeout(initBrowseMap, 200);
+  document.getElementById('page-'+id).classList.add('active');
+  if (id === 'browse') setTimeout(initMap, 200);
   if (id === 'post') setTimeout(initPostMap, 200);
 }
 
-// --- PHOTO LOGIC ---
-const fileInput = document.getElementById('real-file-input');
-const previewContainer = document.getElementById('photoPreviews');
-
-fileInput.addEventListener('change', function(e) {
-  const files = Array.from(e.target.files);
-  files.forEach(file => {
-    if (!file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      uploadedImages.push(event.target.result);
-      renderPhotoPreviews();
-    };
-    reader.readAsDataURL(file);
-  });
-});
-
-function renderPhotoPreviews() {
-  previewContainer.innerHTML = uploadedImages.map((src, index) => `
-    <div class="photo-thumb" style="background-image: url(${src})">
-      <button class="remove" onclick="removePhoto(${index})">✕</button>
-    </div>
-  `).join('');
-}
-
-function removePhoto(index) {
-  uploadedImages.splice(index, 1);
-  renderPhotoPreviews();
-}
-
-// --- MAPS ---
-function initBrowseMap() {
+// MAPS
+function initMap() {
   if (map) return;
   map = L.map('map').setView([7.8731, 80.7718], 7);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-  renderAll();
+  applyFilters();
 }
 
 function initPostMap() {
@@ -224,77 +253,106 @@ function initPostMap() {
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(postMap);
   postMarker = L.marker([6.0535, 80.2210], {draggable: true}).addTo(postMap);
   postMarker.on('dragend', () => {
-    const p = postMarker.getLatLng();
-    document.getElementById('f-lat').value = p.lat;
-    document.getElementById('f-lng').value = p.lng;
+    let pos = postMarker.getLatLng();
+    document.getElementById('f-lat').value = pos.lat;
+    document.getElementById('f-lng').value = pos.lng;
   });
 }
 
-function movePostMap() {
-  const d = document.getElementById('f-district').value;
-  const coords = d === "Colombo" ? [6.9271, 79.8612] : d === "Kandy" ? [7.2906, 80.6337] : [6.0535, 80.2210];
-  postMap.setView(coords, 12);
-  postMarker.setLatLng(coords);
-  document.getElementById('f-lat').value = coords[0];
-  document.getElementById('f-lng').value = coords[1];
+function updateMapPin() {
+    const dist = document.getElementById('f-district').value;
+    const coords = dist === 'Colombo' ? [6.9271, 79.8612] : [6.0535, 80.2210];
+    postMap.setView(coords, 12);
+    postMarker.setLatLng(coords);
 }
 
-// --- RENDER ---
-function renderAll() {
-  const query = document.getElementById('browseSearch').value.toLowerCase();
-  const dist = document.getElementById('filterDist').value;
-  
-  const filtered = listings.filter(l => {
-    const matchSearch = l.title.toLowerCase().includes(query);
-    const matchDist = dist === "All" || l.dist === dist;
-    return matchSearch && matchDist;
-  });
+// PHOTOS LOGIC
+const photoInput = document.getElementById('photo-input');
+const photoPreviews = document.getElementById('photoPreviews');
 
-  // Cards
-  document.getElementById('cardsGrid').innerHTML = filtered.map(l => `
-    <div class="prop-card">
-      <div class="card-img-placeholder" style="background-image: url(${l.imgs[0] || ''})">
-        ${l.imgs.length === 0 ? '🏠' : ''}
-      </div>
-      <div class="card-body">
-        <div class="card-price">LKR ${l.price.toLocaleString()}</div>
-        <div style="font-weight: 600; margin-top:5px;">${l.title}</div>
-        <div style="font-size: 12px; color: var(--muted);">📍 ${l.dist}</div>
-      </div>
-    </div>
-  `).join('');
+photoInput.addEventListener('change', function() {
+    const files = Array.from(this.files);
+    files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            uploadedImages.push(e.target.result);
+            renderPreviews();
+        };
+        reader.readAsDataURL(file);
+    });
+});
 
-  // Markers
-  markers.forEach(m => map.removeLayer(m));
-  markers = filtered.map(l => L.marker([l.lat, l.lng]).addTo(map).bindPopup(l.title));
+function renderPreviews() {
+    photoPreviews.innerHTML = uploadedImages.map((img, index) => `
+        <div class="photo-thumb" style="background-image: url('${img}')">
+            <button class="remove" onclick="removePhoto(${index})">✕</button>
+        </div>
+    `).join('');
 }
 
-// --- SUBMIT ---
+function removePhoto(index) {
+    uploadedImages.splice(index, 1);
+    renderPreviews();
+}
+
+// FILTERS & RENDER
+function applyFilters() {
+    const filtered = listings.filter(l => {
+        const search = document.getElementById('browseSearch').value.toLowerCase();
+        return l.title.toLowerCase().includes(search);
+    });
+    renderCards(filtered);
+    renderMarkers(filtered);
+}
+
+function renderCards(data) {
+    const grid = document.getElementById('cardsGrid');
+    grid.innerHTML = data.map(l => `
+        <div class="prop-card">
+            <div class="card-img">🏠</div>
+            <div class="card-body">
+                <div class="card-price">LKR ${l.price.toLocaleString()}</div>
+                <div style="font-weight:600">${l.title}</div>
+                <div style="font-size:12px; color:var(--muted)">📍 ${l.city}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderMarkers(data) {
+    markers.forEach(m => map.removeLayer(m));
+    markers = data.map(l => L.marker([l.lat, l.lng]).addTo(map).bindPopup(l.title));
+}
+
+// AD SUBMISSION
+function selectType(el, val) {
+    document.querySelectorAll('.type-opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedType = val;
+}
+
 function submitAd() {
-  const title = document.getElementById('f-title').value;
-  const price = document.getElementById('f-price').value;
-  if (!title || !price) return showToast("Title and Price are required!");
-
-  const newListing = {
-    id: Date.now(),
-    title: title,
-    price: parseInt(price),
-    dist: document.getElementById('f-district').value,
-    lat: parseFloat(document.getElementById('f-lat').value),
-    lng: parseFloat(document.getElementById('f-lng').value),
-    imgs: [...uploadedImages] // Save the photos!
-  };
-
-  listings.unshift(newListing);
-  document.getElementById('successOverlay').style.display = 'flex';
+    const title = document.getElementById('f-title').value;
+    if (!title) { showToast("Please add a title"); return; }
+    
+    const newAd = {
+        id: Date.now(),
+        title: title,
+        type: selectedType,
+        price: document.getElementById('f-price').value,
+        lat: document.getElementById('f-lat').value,
+        lng: document.getElementById('f-lng').value,
+        photos: uploadedImages
+    };
+    listings.push(newAd);
+    document.getElementById('successOverlay').classList.add('show');
 }
 
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.style.opacity = 1;
-  setTimeout(() => t.style.opacity = 0, 3000);
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
 }
 </script>
 </body>
 </html>
-

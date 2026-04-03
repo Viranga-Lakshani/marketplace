@@ -9,15 +9,15 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root {
-  /* DISTINGUISHED MODERN COLORS MATCHING THE NAVY/BLUE LOGO */
-  --primary-navy: #0f172a;    /* Deep Professional Navy */
-  --accent-blue: #2563eb;     /* Vibrant Azure Blue */
-  --accent-soft: #dbeafe;     /* Light Blue Tint */
-  --bg-main: #f8fafc;         /* Clean Slate White */
+  /* DISTINGUISHED COLORS MATCHING THE LOGO */
+  --primary-navy: #0f172a;
+  --accent-blue: #2563eb;
+  --accent-soft: #dbeafe;
+  --bg-main: #f8fafc;
   --surface: #ffffff;
-  --text-main: #1e293b;       /* Dark Steel Text */
-  --text-muted: #64748b;      /* Muted Slate Text */
-  --border: #e2e8f0;          /* Subtle Border */
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
   --shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
   --shadow-lg: 0 12px 40px rgba(15, 23, 42, 0.12);
 }
@@ -43,7 +43,6 @@ nav {
 .nav-btn.ghost { background: transparent; color: var(--text-muted); }
 .nav-btn.ghost:hover { color: var(--primary-navy); background: var(--accent-soft); }
 .nav-btn.primary { background: var(--accent-blue); color: #fff; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
-.nav-btn.primary:hover { background: #1d4ed8; transform: translateY(-1px); }
 
 /* BROWSE PAGE */
 .browse-layout { display: grid; grid-template-columns: 360px 1fr; min-height: calc(100vh - 72px); }
@@ -71,7 +70,7 @@ nav {
 .card-body { padding: 18px; }
 .card-price { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 800; color: var(--accent-blue); }
 
-/* POST AD PAGE & REAL PHOTO UPLOAD */
+/* POST AD & PHOTO UPLOAD */
 .post-wrap { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
 .form-card { background: #fff; border-radius: 16px; padding: 30px; box-shadow: var(--shadow); margin-bottom: 24px; border: 1px solid var(--border); }
 .photo-drop { border: 2px dashed var(--border); border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; background: var(--bg-main); transition: 0.2s; }
@@ -86,6 +85,8 @@ input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px var(--acce
 .submit-btn { width: 100%; padding: 18px; background: var(--primary-navy); color: white; border: none; border-radius: 12px; font-family: 'Playfair Display'; font-size: 18px; font-weight: 700; cursor: pointer; transition: 0.2s; }
 .submit-btn:hover { background: var(--accent-blue); transform: translateY(-2px); box-shadow: var(--shadow-lg); }
 
+.page { display: none; }
+.page.active { display: block; }
 .success-overlay { position: fixed; inset: 0; z-index: 999; background: rgba(255, 255, 255, 0.98); display: none; align-items: center; justify-content: center; text-align: center; }
 .success-overlay.show { display: flex; }
 </style>
@@ -108,8 +109,8 @@ input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px var(--acce
   <div style="background: var(--primary-navy); padding: 100px 20px; text-align: center; color: white;">
     <h1 style="font-family: 'Playfair Display', serif; font-size: 52px; margin-bottom: 20px;">Premium Properties<br>in <span style="color:var(--accent-blue)">Sri Lanka</span></h1>
     <div style="max-width: 650px; margin: 30px auto; display: flex; gap: 10px; background: white; padding: 10px; border-radius: 14px; box-shadow: var(--shadow-lg);">
-      <input type="text" id="h-search" placeholder="Search by city or district..." style="flex:1; border:none; outline:none; padding:10px 15px; font-size:16px;">
-      <button class="nav-btn primary" onclick="doSearch()" style="padding: 0 30px;">Search</button>
+      <input type="text" id="h-search" placeholder="Search by city or district..." style="flex:1; border:none; outline:none; padding:10px 15px; font-size:16px; color: var(--text-main);">
+      <button class="nav-btn primary" onclick="showPage('browse')" style="padding: 0 30px;">Search</button>
     </div>
   </div>
 </div>
@@ -177,7 +178,7 @@ input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px var(--acce
   <div>
     <div style="font-size: 70px;">🎉</div>
     <h2 style="font-family: 'Playfair Display'; font-size: 32px; color: var(--primary-navy); margin-top: 20px;">Listing Published!</h2>
-    <p style="color: var(--text-muted); margin: 15px 0 30px;">Your property is now visible to thousands of buyers.</p>
+    <p style="color: var(--text-muted); margin: 15px 0 30px;">Your property is now visible on the map.</p>
     <button class="nav-btn primary" onclick="location.reload()">Return Home</button>
   </div>
 </div>
@@ -189,7 +190,6 @@ let listings = [
 let currentPhotos = [];
 let map, postMap, postMarker, markers = [];
 
-// NAVIGATION
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
@@ -198,7 +198,7 @@ function showPage(id) {
   window.scrollTo(0,0);
 }
 
-// REAL PHOTO BROWSING
+// REAL PHOTO UPLOAD LOGIC
 document.getElementById('photo-input').addEventListener('change', function(e) {
   const files = Array.from(e.target.files);
   files.forEach(file => {
@@ -225,7 +225,7 @@ function removePhoto(i) {
   renderPreviews();
 }
 
-// MAP & BROWSE
+// MAP & BROWSE LOGIC
 function initBrowse() {
   if (map) { map.invalidateSize(); return; }
   map = L.map('map').setView([7.8731, 80.7718], 7);
@@ -277,7 +277,7 @@ function submitAd() {
   listings.unshift({
     id: Date.now(),
     title: title,
-    price: parseInt(document.getElementById('f-price').value),
+    price: parseInt(document.getElementById('f-price').value) || 0,
     dist: 'Galle',
     lat: parseFloat(document.getElementById('f-lat').value),
     lng: parseFloat(document.getElementById('f-lng').value),
@@ -287,7 +287,6 @@ function submitAd() {
   document.getElementById('successOverlay').classList.add('show');
 }
 
-function doSearch() { showPage('browse'); }
 function setChip(el) {
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
